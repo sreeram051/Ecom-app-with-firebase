@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import FormInput from "../form-input/form.input.component";
 import "./log-in.styles.scss";
+import { UserContext } from "../../contexts/user.context";
 
 import {
   createUserDocumentFromAuth,
@@ -30,17 +31,21 @@ const LogInForm = () => {
     await createUserDocumentFromAuth(user);
   };
 
+  const { setCurrentUser } = useContext(UserContext);
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await signInAuthUserWithEmailAndPassword(
+      const { user } = await signInAuthUserWithEmailAndPassword(
         email,
         password
       );
-      console.log(response);
+      setCurrentUser(user);
+      console.log(user);
       clearFormFields();
-    } catch (error) {}
+    } catch (error) {
+      console.log("Error signing in:", error); // Log the entire error object
+    }
   };
 
   return (
@@ -67,7 +72,7 @@ const LogInForm = () => {
         />
         <div className="buttons-container">
           <Button type="submit">sign in</Button>
-          <Button type="submit" buttonType={"google"} onClick={logGoogleUser}>
+          <Button type="button" buttonType={"google"} onClick={logGoogleUser}>
             google sign in
           </Button>
         </div>
